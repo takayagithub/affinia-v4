@@ -1,17 +1,26 @@
 
-// v5 alpha patch: 9-scale quiz + drawer nav + mix flag
+// v5.1: add scrim + close interactions, guard nulls, keep 9-scale logic
+
+function qs(s){return document.querySelector(s);}
+function getParam(name){ const u=new URL(location.href); return u.searchParams.get(name);}
+
 document.addEventListener('DOMContentLoaded', () => {
   const t = document.getElementById('navToggle');
   const n = document.getElementById('nav');
   if (t && n) {
-    t.onclick = () => {
-      const open = n.classList.toggle('open');
-      t.setAttribute('aria-expanded', open ? 'true' : 'false');
-    };
+    // create scrim
+    let scrim = document.querySelector('.scrim');
+    if(!scrim){ scrim = document.createElement('div'); scrim.className='scrim'; document.body.appendChild(scrim); }
+    const closeNav = ()=>{ n.classList.remove('open'); scrim.classList.remove('show'); document.body.classList.remove('lock'); t.setAttribute('aria-expanded','false'); };
+    const openNav  = ()=>{ n.classList.add('open'); scrim.classList.add('show'); document.body.classList.add('lock'); t.setAttribute('aria-expanded','true'); };
+    t.onclick = ()=>{ if(n.classList.contains('open')) closeNav(); else openNav(); };
+    scrim.addEventListener('click', closeNav);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeNav(); });
+    n.querySelectorAll('a').forEach(a=>a.addEventListener('click', closeNav));
   }
 });
-function qs(s){return document.querySelector(s);}
-function getParam(name){ const u=new URL(location.href); return u.searchParams.get(name);}
+
+// reuse existing AFFINIA_TYPES if present
 const AFFINIA_TYPES = (typeof AFFINIA_TYPES!=="undefined" && AFFINIA_TYPES.length) ? AFFINIA_TYPES : [
   {"code":"A1","name":"情熱ヒーロー","catch":"勢いとまっすぐさが武器。","desc":"熱量が高く、まわりを前向きに引っぱります。"},
   {"code":"A2","name":"クールブレイン","catch":"静かにコツコツ、頭脳派。","desc":"ムダを減らして、静かに成果を出します。"},
@@ -30,6 +39,8 @@ const AFFINIA_TYPES = (typeof AFFINIA_TYPES!=="undefined" && AFFINIA_TYPES.lengt
   {"code":"D3","name":"キラキラアイドル","catch":"自分らしく輝かせる。","desc":"人前でも自分らしく表現できます。"},
   {"code":"D4","name":"ツンデレニャンコ","catch":"素直じゃないのが素直。","desc":"自分のペースを大切にしつつ、信頼した人にはよく懐きます。"}
 ];
+
+// 7 questions, 9-scale
 const QUESTIONS = [
   {axis:'X', text:'朝のスタートは？', left:'ゆっくり整えてから', right:'すぐ動きたい'},
   {axis:'X', text:'計画が崩れたら？', left:'静かに立て直す', right:'勢いで切り替える'},
@@ -39,10 +50,15 @@ const QUESTIONS = [
   {axis:'Y', text:'困ってる人を見たら？', left:'そっと寄りそう', right:'具体的に動く'},
   {axis:'Y', text:'夜の過ごし方は？', left:'静かに回復', right:'誰かと発散'}
 ];
+
 function mountQuiz(){
   const el = qs('#quiz'); if(!el) return;
+  // guard for required elements; if not present, don't crash
+  const bar = qs('#bar'), qwrap = qs('#qwrap'), bubbles = qs('#bubbles'),
+        leftL=qs('#leftLabel'), rightL=qs('#rightLabel');
+  if(!bar || !qwrap || !bubbles || !leftL || !rightL) return; // old HTML -> avoid error
+
   let idx=0; const answers = Array(QUESTIONS.length).fill(5);
-  const bar = qs('#bar'), qwrap = qs('#qwrap'), bubbles = qs('#bubbles'), leftL=qs('#leftLabel'), rightL=qs('#rightLabel');
   function render(){
     const q=QUESTIONS[idx];
     bar.style.width = Math.round((idx/QUESTIONS.length)*100)+'%';
@@ -56,11 +72,13 @@ function mountQuiz(){
       b.onclick=()=>{ answers[idx]=i; render(); };
       bubbles.appendChild(b);
     }
-    qs('#prevBtn').disabled = idx===0;
-    qs('#nextBtn').textContent = idx===QUESTIONS.length-1 ? "結果を見る" : "次へ";
+    const prev = qs('#prevBtn'), next = qs('#nextBtn');
+    if(prev) prev.disabled = idx===0;
+    if(next) next.textContent = idx===QUESTIONS.length-1 ? "結果を見る" : "次へ";
   }
-  qs('#prevBtn').onclick=()=>{ if(idx>0){idx--; render();} };
-  qs('#nextBtn').onclick=()=>{
+  const prev = qs('#prevBtn'), next = qs('#nextBtn');
+  if(prev) prev.onclick=()=>{ if(idx>0){idx--; render();} };
+  if(next) next.onclick=()=>{
     if(idx<QUESTIONS.length-1){ idx++; render(); return; }
     const norm = answers.map(v => (v-1)/8);
     let x=0,y=0,xc=0,yc=0;
@@ -75,6 +93,7 @@ function mountQuiz(){
   };
   render();
 }
+
 function mountResult(){
   const box = qs('#resultBox'); if(!box) return;
   let code = getParam('t'); let payload=null;
@@ -97,4 +116,5 @@ function mountResult(){
       '</div>'+
     '</article>';
 }
+
 document.addEventListener('DOMContentLoaded',()=>{ mountQuiz(); mountResult(); });
