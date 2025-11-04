@@ -1,19 +1,24 @@
 
-/* v5.3.1 patch */
-/* Header/Footer side paddings a bit wider */
+/* v5.4 inspired UI patch (clean-room) */
+:root{--opt-bg:#fff;--opt-border:#efdfeb;--opt-hover:#fff5fb;--opt-active:#fde1ec}
+.options{display:grid;gap:10px;margin-top:10px}
+@media(min-width:520px){.options{grid-template-columns:1fr 1fr}}
+.option-card{display:flex;align-items:center;gap:12px;border:1px solid var(--opt-border);
+  background:var(--opt-bg);border-radius:16px;padding:14px 14px;cursor:pointer;
+  transition:transform .06s ease, box-shadow .12s ease, background .12s ease}
+.option-card:hover{background:var(--opt-hover)}
+.option-card.active{background:var(--opt-active);border-color:#f0bcd0; box-shadow:0 6px 20px rgba(233,125,160,.15)}
+.option-ic{flex:0 0 auto;width:36px;height:36px;border-radius:10px;background:#ffe9f3;display:flex;align-items:center;justify-content:center;font-size:18px}
+.option-body{line-height:1.5}
+.option-title{font-weight:700}
+.option-desc{font-size:13px;color:#666;margin-top:2px}
+.fine-rail{display:grid;grid-template-columns:repeat(9,1fr);gap:8px;margin:12px 0 2px}
+.fine-rail .dot{height:10px;border-radius:999px;background:#f2d6e3;cursor:pointer;transition:height .06s ease, background .12s}
+.fine-rail .dot.active{background:#e97da0;height:14px}
+.rail-labels{display:flex;justify-content:space-between;font-size:12px;color:#666}
 .site-header .container{padding:0 26px}
 .site-footer .container{padding:0 26px}
-
-/* Drawer close button */
 .nav{position:relative}
-.nav .nav-close{
-  position:absolute; top:10px; right:10px;
-  width:36px; height:36px; border-radius:10px;
-  border:1px solid var(--border); background:#fff; color:#444;
-  font-size:22px; line-height:34px; text-align:center; cursor:pointer;
-  z-index:1201;
-}
-.nav .nav-close:focus{outline:3px solid var(--ring); outline-offset:2px}
-@media (min-width:920px){
-  .nav .nav-close{display:none}
-}
+.nav .nav-close{position:absolute;top:10px;right:10px;width:36px;height:36px;border-radius:10px;border:1px solid var(--border);
+  background:#fff;color:#444;font-size:22px;line-height:34px;text-align:center;cursor:pointer;z-index:1201}
+@media(min-width:920px){.nav .nav-close{display:none}}
