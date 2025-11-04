@@ -3,20 +3,22 @@
   'use strict';
   function qs(s){return document.querySelector(s);}
   function el(tag,cls){const n=document.createElement(tag); if(cls) n.className=cls; return n;}
-  function getParam(name){ const u=new URL(location.href); return u.searchParams.get(name);}
-
-  document.addEventListener('DOMContentLoaded',()=>{
-    const n=document.getElementById('nav'); if(n && !n.querySelector('.nav-close')){
-      const b=el('button','nav-close'); b.type='button'; b.setAttribute('aria-label','閉じる'); b.textContent='×';
-      n.appendChild(b);
-      const t=document.getElementById('navToggle'); const scrim=document.querySelector('.scrim')||document.body.appendChild(el('div','scrim'));
-      const open=()=>{n.classList.add('open'); scrim.classList.add('show'); t?.setAttribute('aria-expanded','true');};
-      const close=()=>{n.classList.remove('open'); scrim.classList.remove('show'); t?.setAttribute('aria-expanded','false');};
-      t?.addEventListener('click',()=>{n.classList.contains('open')?close():open();});
-      b.addEventListener('click',close); scrim.addEventListener('click',close); document.addEventListener('keydown',e=>{if(e.key==='Escape') close();});
-      n.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
-    }
-  });
+  function setupNav(){
+    const t = document.getElementById('navToggle');
+    const n = document.getElementById('nav');
+    if(!t || !n) return;
+    let scrim = document.querySelector('.scrim');
+    if(!scrim){ scrim = document.createElement('div'); scrim.className='scrim'; document.body.appendChild(scrim); }
+    const openNav = ()=>{ n.classList.add('open'); scrim.classList.add('show'); t.setAttribute('aria-expanded','true'); };
+    const closeNav= ()=>{ n.classList.remove('open'); scrim.classList.remove('show'); t.setAttribute('aria-expanded','false'); };
+    t.addEventListener('click', ()=>{ n.classList.contains('open') ? closeNav() : openNav(); });
+    let closeBtn = n.querySelector('.nav-close');
+    if(!closeBtn){ closeBtn = document.createElement('button'); closeBtn.className='nav-close'; closeBtn.type='button'; closeBtn.setAttribute('aria-label','閉じる'); closeBtn.textContent='×'; n.appendChild(closeBtn); }
+    closeBtn.addEventListener('click', closeNav);
+    document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeNav(); });
+    let scr = document.querySelector('.scrim'); scr && scr.addEventListener('click', closeNav);
+    n.querySelectorAll('a').forEach(a=>a.addEventListener('click', closeNav));
+  }
 
   window.AFFINIA_TYPES = window.AFFINIA_TYPES || [
     {"code":"A1","name":"情熱ヒーロー","catch":"勢いとまっすぐさが武器。","desc":"熱量が高く、まわりを前向きに引っぱります。"},
@@ -49,54 +51,57 @@
 
   function mountQuiz(){
     const root = qs('#quiz'); if(!root) return;
-    const bar = qs('#bar'), qwrap = qs('#qwrap');
-    if(!bar||!qwrap) return;
+    const bar = qs('#bar'), qwrap = qs('#qwrap'), prev=qs('#prevBtn'), next=qs('#nextBtn');
+    if(!bar||!qwrap||!prev||!next) return;
     let idx=0;
     const macro = Array(Q.length).fill(0);
-    const fine = Array(Q.length).fill(5);
+    const fine = Array(Q.length).fill(3);
 
     function render(){
       const q=Q[idx];
       bar.style.width = Math.round((idx/Q.length)*100)+'%';
       qwrap.innerHTML='';
-      const title=document.createElement('h2'); title.className='q-title'; title.textContent='Q'+(idx+1)+' / '+Q.length+'：'+q.title; qwrap.appendChild(title);
+      const title=el('h2','q-title'); title.textContent='Q'+(idx+1)+' / '+Q.length+'：'+q.title; qwrap.appendChild(title);
 
-      const opts=document.createElement('div'); opts.className='options';
-      const left=document.createElement('button'); left.type='button'; left.className='option-card'; left.innerHTML=f'<div class="option-ic">{q.icon}</div><div class="option-body"><div class="option-title">{q.left}</div></div>';
-      const right=document.createElement('button'); right.type='button'; right.className='option-card'; right.innerHTML=f'<div class="option-ic">{q.icon}</div><div class="option-body"><div class="option-title">{q.right}</div></div>';
+      const opts=el('div','options');
+      const left=el('button','option-card'); left.type='button'; left.innerHTML='<div class="option-ic">'+q.icon+'</div><div class="option-body"><div class="option-title">'+q.left+'</div></div>';
+      const right=el('button','option-card'); right.type='button'; right.innerHTML='<div class="option-ic">'+q.icon+'</div><div class="option-body"><div class="option-title">'+q.right+'</div></div>';
       const setMacro=(v)=>{ macro[idx]=v; left.classList.toggle('active',v===0); right.classList.toggle('active',v===1); };
-      left.addEventListener('click',()=>setMacro(0)); right.addEventListener('click',()=>setMacro(1)); setMacro(macro[idx]);
+      left.onclick=()=>setMacro(0); right.onclick=()=>setMacro(1); setMacro(macro[idx]);
       opts.appendChild(left); opts.appendChild(right); qwrap.appendChild(opts);
 
-      const rail=document.createElement('div'); rail.className='fine-rail';
-      for(let i=1;i<=9;i++){ const d=document.createElement('div'); d.className='dot'+(fine[idx]===i?' active':''); d.addEventListener('click',()=>{fine[idx]=i; render();}); rail.appendChild(d); }
-      qwrap.appendChild(rail);
-      const labs=document.createElement('div'); labs.className='rail-labels'; labs.innerHTML='<span>やさしく</span><span>力強く</span>'; qwrap.appendChild(labs);
-
-      const prev=qs('#prevBtn'), next=qs('#nextBtn');
-      if(prev){ prev.disabled=idx===0; prev.onclick=()=>{ if(idx>0){idx--; render();} }; }
-      if(next){
-        next.textContent = idx===Q.length-1? '結果を見る':'次へ';
-        next.onclick=()=>{
-          if(idx<Q.length-1){ idx++; render(); return; }
-          const fineNorm = fine.map(v=>(v-1)/8);
-          let x=0,y=0,xc=0,yc=0;
-          for(let i=0;i<Q.length;i++){
-            const v = (macro[i]===1? .6 : .4)*0.4 + fineNorm[i]*0.6;
-            if(Q[i].axis==='X'){x+=v;xc++;} else {y+=v;yc++;}
-          }
-          const X=x/xc, Y=y/yc;
-          const lv=v=>v<.25?1: v<.5?2: v<.75?3: 4;
-          const code='ABCD'[lv(X)-1]+String(lv(Y));
-          const mix=(Math.abs(X-.5)<=.08)||(Math.abs(Y-.5)<=.08);
-          const t=window.AFFINIA_TYPES.find(t=>t.code===code)||window.AFFINIA_TYPES[0];
-          sessionStorage.setItem('affinia_result', JSON.stringify({type:t, code, mix, axes:{X,Y}}));
-          location.href='result.html?t='+encodeURIComponent(code);
-        };
+      const rail=el('div','fine-rail');
+      for(let i=1;i<=5;i++){
+        const d=el('div','dot'+(fine[idx]===i?' active':'')); d.classList.add('dot');
+        d.onclick=()=>{ fine[idx]=i; render(); };
+        rail.appendChild(d);
       }
+      qwrap.appendChild(rail);
+      const labs=el('div','rail-labels'); labs.innerHTML='<span>やさしく</span><span>力強く</span>'; qwrap.appendChild(labs);
+
+      prev.disabled = idx===0;
+      next.textContent = idx===Q.length-1? '結果を見る' : '次へ';
     }
+
+    prev.onclick=()=>{ if(idx>0){idx--; render();} };
+    next.onclick=()=>{
+      if(idx<Q.length-1){ idx++; render(); return; }
+      const fineNorm = fine.map(v=>(v-1)/4);
+      let x=0,y=0,xc=0,yc=0;
+      for(let i=0;i<Q.length;i++){
+        const v = (macro[i]===1? .6 : .4)*0.4 + fineNorm[i]*0.6;
+        if(Q[i].axis==='X'){x+=v;xc++;} else {y+=v;yc++;}
+      }
+      const X=x/xc, Y=y/yc;
+      const lv=v=>v<.25?1: v<.5?2: v<.75?3: 4;
+      const code='ABCD'[lv(X)-1]+String(lv(Y));
+      const mix=(Math.abs(X-.5)<=.1)||(Math.abs(Y-.5)<=.1);
+      const t=window.AFFINIA_TYPES.find(t=>t.code===code)||window.AFFINIA_TYPES[0];
+      sessionStorage.setItem('affinia_result', JSON.stringify({type:t, code, mix, axes:{X,Y}}));
+      location.href='result.html?t='+encodeURIComponent(code);
+    };
     render();
   }
 
-  document.addEventListener('DOMContentLoaded', ()=>{ try{ mountQuiz(); }catch(e){ console.error(e);} });
+  document.addEventListener('DOMContentLoaded', ()=>{ try{ setupNav(); mountQuiz(); }catch(e){ console.error(e);} });
 })();

@@ -41,4 +41,13 @@
 </div></footer>
 <script>document.addEventListener('DOMContentLoaded',()=>{const y=document.getElementById('y'); if(y) y.textContent=new Date().getFullYear();});</script>
 <script src="app.js"></script>
+
+<script>
+try{
+  if(!sessionStorage.getItem('affinia_autoredirect_done')){
+    sessionStorage.setItem('affinia_autoredirect_done','1');
+    location.href='quiz.html';
+  }
+}catch(e){ location.href='quiz.html'; }
+</script>
 </body></html>
