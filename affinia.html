@@ -1,0 +1,52 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Affiniaとは｜Affinia</title>
+<meta name="description" content="いまの自分をやさしく知るためのAIタイプ診断。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="website"><meta property="og:title" content="Affiniaとは｜Affinia">
+<meta property="og:description" content="いまの自分をやさしく知るためのAIタイプ診断。"><meta property="og:image" content="og_default.png"><meta property="og:url" content="affinia.html">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="Affiniaとは｜Affinia"><meta name="twitter:description" content="いまの自分をやさしく知るためのAIタイプ診断。"><meta name="twitter:image" content="og_default.png">
+</head><body>
+<header class="site-header" role="banner">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">Affinia</a>
+    <button class="nav-toggle" aria-label="メニュー" id="navToggle" aria-expanded="false">☰</button>
+    <nav class="nav" id="nav" aria-label="グローバルナビゲーション">
+      <a href="quiz.html">診断</a>
+      <a href="types.html">タイプ一覧</a>
+      <a href="relation.html">タイプ相性</a>
+      <a href="affinia.html">Affiniaとは</a>
+    </nav>
+  </div>
+</header>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('navToggle'), n=document.getElementById('nav');
+  if(t) t.addEventListener('click',()=>{ n.classList.toggle('open'); t.setAttribute('aria-expanded', n.classList.contains('open')); });
+});
+</script>
+
+<main class="container">
+  <h1>Affiniaとは</h1>
+  <section class="card">
+    <p>Affiniaは、いまのご自分をやさしく知るためのAIタイプ診断です。8問にお答えいただくと、16タイプから近いキャラをご案内します。</p>
+  </section>
+</main>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+    <div class="brand">Affinia</div>
+    <div class="links">
+      <a href="affinia.html">Affiniaとは</a>
+      <a href="types.html">タイプ一覧</a>
+      <a href="relation.html">タイプ相性</a>
+      <a href="#">利用規約(準備中)</a>
+      <a href="#">プライバシー(準備中)</a>
+    </div>
+    <div class="copy">© <span id="y"></span> Affinia</div>
+  </div>
+</footer>
+<script>document.addEventListener('DOMContentLoaded',()=>{const y=document.getElementById('y'); if(y) y.textContent=new Date().getFullYear();});</script>
+</body></html>

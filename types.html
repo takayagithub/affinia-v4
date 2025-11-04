@@ -1,0 +1,67 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>タイプ一覧｜Affinia</title>
+<meta name="description" content="16タイプの一覧から詳しい説明へ。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="website"><meta property="og:title" content="タイプ一覧｜Affinia">
+<meta property="og:description" content="16タイプの一覧から詳しい説明へ。"><meta property="og:image" content="og_default.png"><meta property="og:url" content="types.html">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="タイプ一覧｜Affinia"><meta name="twitter:description" content="16タイプの一覧から詳しい説明へ。"><meta name="twitter:image" content="og_default.png">
+</head><body>
+<header class="site-header" role="banner">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">Affinia</a>
+    <button class="nav-toggle" aria-label="メニュー" id="navToggle" aria-expanded="false">☰</button>
+    <nav class="nav" id="nav" aria-label="グローバルナビゲーション">
+      <a href="quiz.html">診断</a>
+      <a href="types.html">タイプ一覧</a>
+      <a href="relation.html">タイプ相性</a>
+      <a href="affinia.html">Affiniaとは</a>
+    </nav>
+  </div>
+</header>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('navToggle'), n=document.getElementById('nav');
+  if(t) t.addEventListener('click',()=>{ n.classList.toggle('open'); t.setAttribute('aria-expanded', n.classList.contains('open')); });
+});
+</script>
+
+<main class="container">
+  <h1>タイプ一覧</h1>
+  <section class="section">
+    <div id="grid" class="grid cols-3" role="list"></div>
+  </section>
+</main>
+<script>
+const AFFINIA_TYPES = [{"code": "A1", "name": "ツンデレニャンコ", "catch": "素直じゃないのが素直。", "desc": "自分のペースを大切にしつつ、信頼した人にはよく懐きます。"}, {"code": "A2", "name": "情熱ヒーロー", "catch": "勢いとまっすぐさが武器。", "desc": "熱量が高く、まわりを前向きに引っぱります。"}, {"code": "A3", "name": "クールブレイン", "catch": "静かにコツコツ、頭脳派。", "desc": "ムダを減らして、静かに成果を出します。"}, {"code": "A4", "name": "ハッピーバニー", "catch": "その場を明るくする達人。", "desc": "空気をやわらかくして、皆を笑顔にします。"}, {"code": "B1", "name": "癒し天使", "catch": "やさしさで場をととのえる。", "desc": "人の気持ちに気づき、そっと支えるのが得意です。"}, {"code": "B2", "name": "おちゃめキツネ", "catch": "ひらめきと遊び心で動く。", "desc": "機転がきき、場を明るくひっくり返すことも。"}, {"code": "B3", "name": "博識フクロウ", "catch": "深く考えて、広く見る。", "desc": "情報を集め、洞察から一歩先を提案します。"}, {"code": "B4", "name": "ゴージャスプリンセス", "catch": "こだわりで魅せるリーダー気質。", "desc": "見た目や体験の質にもこだわり、安心感を出します。"}, {"code": "C1", "name": "夢見るユニコーン", "catch": "理想を形にしていく。", "desc": "思いつきを実験して形にしていきます。"}, {"code": "C2", "name": "頑張りミツバチ", "catch": "小さな積み重ねが得意。", "desc": "コツコツ続けて、信頼を積み上げます。"}, {"code": "C3", "name": "もじもじヒツジ", "catch": "静かな安心感。", "desc": "落ち着いた環境で力を発揮します。"}, {"code": "C4", "name": "ドジっ子リス", "catch": "元気で親しみやすい。", "desc": "多少のドジも愛嬌に変えられます。"}, {"code": "D1", "name": "パンクハリネズミ", "catch": "やさしい線引きが上手。", "desc": "自分と相手の距離感を大切にします。"}, {"code": "D2", "name": "マイペースナマケモノ", "catch": "自分のペースを守る名人。", "desc": "無理しないで結果を出すタイプです。"}, {"code": "D3", "name": "健気ワンコ", "catch": "誰かの力になるのが好き。", "desc": "縁の下の力持ちとして動けます。"}, {"code": "D4", "name": "キラキラアイドル", "catch": "自分らしく輝かせる。", "desc": "人前でも自分らしく表現できます。"}];
+const g=document.getElementById('grid');
+g.innerHTML = AFFINIA_TYPES.map(t=>
+  '<article class="card" role="listitem">'+
+    '<div class="small">コード: '+t.code+'</div>'+
+    '<h3>'+t.name+'</h3>'+
+    '<p class="small">'+t.catch+'</p>'+
+    '<div class="list-inline">'+
+      '<a class="btn ghost" href="result.html?t='+encodeURIComponent(t.code)+'">詳しく見る</a>'+
+      '<a class="btn primary" href="relation.html?me='+encodeURIComponent(t.code)+'">タイプ相性</a>'+
+    '</div>'+
+  '</article>'
+).join('');
+</script>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+    <div class="brand">Affinia</div>
+    <div class="links">
+      <a href="affinia.html">Affiniaとは</a>
+      <a href="types.html">タイプ一覧</a>
+      <a href="relation.html">タイプ相性</a>
+      <a href="#">利用規約(準備中)</a>
+      <a href="#">プライバシー(準備中)</a>
+    </div>
+    <div class="copy">© <span id="y"></span> Affinia</div>
+  </div>
+</footer>
+<script>document.addEventListener('DOMContentLoaded',()=>{const y=document.getElementById('y'); if(y) y.textContent=new Date().getFullYear();});</script>
+</body></html>

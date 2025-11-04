@@ -1,0 +1,87 @@
+<!doctype html><html lang="ja"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>タイプ相性｜Affinia</title>
+<meta name="description" content="タイプどうしの相性のヒントをご案内。">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<meta property="og:type" content="website"><meta property="og:title" content="タイプ相性｜Affinia">
+<meta property="og:description" content="タイプどうしの相性のヒントをご案内。"><meta property="og:image" content="og_default.png"><meta property="og:url" content="relation.html">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="タイプ相性｜Affinia"><meta name="twitter:description" content="タイプどうしの相性のヒントをご案内。"><meta name="twitter:image" content="og_default.png">
+</head><body>
+<header class="site-header" role="banner">
+  <div class="container header-inner">
+    <a href="index.html" class="logo">Affinia</a>
+    <button class="nav-toggle" aria-label="メニュー" id="navToggle" aria-expanded="false">☰</button>
+    <nav class="nav" id="nav" aria-label="グローバルナビゲーション">
+      <a href="quiz.html">診断</a>
+      <a href="types.html">タイプ一覧</a>
+      <a href="relation.html">タイプ相性</a>
+      <a href="affinia.html">Affiniaとは</a>
+    </nav>
+  </div>
+</header>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  const t=document.getElementById('navToggle'), n=document.getElementById('nav');
+  if(t) t.addEventListener('click',()=>{ n.classList.toggle('open'); t.setAttribute('aria-expanded', n.classList.contains('open')); });
+});
+</script>
+
+<main class="container">
+  <h1>タイプ相性</h1>
+  <section class="rel-layout">
+    <aside class="card">
+      <h2>タイプを選ぶ</h2>
+      <label class="small" for="meSel">ご自分のタイプ</label><br>
+      <select id="meSel"></select><br><br>
+      <label class="small" for="youSel">相手のタイプ</label><br>
+      <select id="youSel"></select>
+    </aside>
+    <section class="card" id="out" aria-live="polite"></section>
+  </section>
+</main>
+<script>
+const AFFINIA_TYPES = [{"code": "A1", "name": "ツンデレニャンコ", "catch": "素直じゃないのが素直。", "desc": "自分のペースを大切にしつつ、信頼した人にはよく懐きます。"}, {"code": "A2", "name": "情熱ヒーロー", "catch": "勢いとまっすぐさが武器。", "desc": "熱量が高く、まわりを前向きに引っぱります。"}, {"code": "A3", "name": "クールブレイン", "catch": "静かにコツコツ、頭脳派。", "desc": "ムダを減らして、静かに成果を出します。"}, {"code": "A4", "name": "ハッピーバニー", "catch": "その場を明るくする達人。", "desc": "空気をやわらかくして、皆を笑顔にします。"}, {"code": "B1", "name": "癒し天使", "catch": "やさしさで場をととのえる。", "desc": "人の気持ちに気づき、そっと支えるのが得意です。"}, {"code": "B2", "name": "おちゃめキツネ", "catch": "ひらめきと遊び心で動く。", "desc": "機転がきき、場を明るくひっくり返すことも。"}, {"code": "B3", "name": "博識フクロウ", "catch": "深く考えて、広く見る。", "desc": "情報を集め、洞察から一歩先を提案します。"}, {"code": "B4", "name": "ゴージャスプリンセス", "catch": "こだわりで魅せるリーダー気質。", "desc": "見た目や体験の質にもこだわり、安心感を出します。"}, {"code": "C1", "name": "夢見るユニコーン", "catch": "理想を形にしていく。", "desc": "思いつきを実験して形にしていきます。"}, {"code": "C2", "name": "頑張りミツバチ", "catch": "小さな積み重ねが得意。", "desc": "コツコツ続けて、信頼を積み上げます。"}, {"code": "C3", "name": "もじもじヒツジ", "catch": "静かな安心感。", "desc": "落ち着いた環境で力を発揮します。"}, {"code": "C4", "name": "ドジっ子リス", "catch": "元気で親しみやすい。", "desc": "多少のドジも愛嬌に変えられます。"}, {"code": "D1", "name": "パンクハリネズミ", "catch": "やさしい線引きが上手。", "desc": "自分と相手の距離感を大切にします。"}, {"code": "D2", "name": "マイペースナマケモノ", "catch": "自分のペースを守る名人。", "desc": "無理しないで結果を出すタイプです。"}, {"code": "D3", "name": "健気ワンコ", "catch": "誰かの力になるのが好き。", "desc": "縁の下の力持ちとして動けます。"}, {"code": "D4", "name": "キラキラアイドル", "catch": "自分らしく輝かせる。", "desc": "人前でも自分らしく表現できます。"}];
+function byCode(c){return AFFINIA_TYPES.find(t=>t.code===c)}
+function idxOf(code){return AFFINIA_TYPES.findIndex(t=>t.code===code)}
+function relationKind(aIdx,bIdx){
+  if(aIdx===bIdx) return "似ている関係";
+  const diff=Math.abs(aIdx-bIdx);
+  if(diff===1 || diff===5 || diff===15) return "補い合う関係";
+  return "刺激し合う関係";
+}
+function advice(a,b){
+  const kind = relationKind(idxOf(a.code), idxOf(b.code));
+  if(kind==="似ている関係") return "考えが近いので安心しやすいです。役割が重ならないよう分担するとよりうまくいきます。";
+  if(kind==="補い合う関係") return "違いを役割として歓迎すると強いチームになります。相手の得意は任せ、自分の得意を渡しましょう。";
+  return "テンポや考え方が違うぶん、新しい発見が増えます。週1回の振り返りで小さく改善していきましょう。";
+}
+function fillSelect(sel, selected){
+  AFFINIA_TYPES.forEach(t=>{
+    const opt=document.createElement('option'); opt.value=t.code; opt.textContent=t.name+'（'+t.code+'）';
+    if(selected && selected===t.code) opt.selected=true; sel.appendChild(opt);
+  });
+}
+const meSel=document.getElementById('meSel'); const youSel=document.getElementById('youSel'); const out=document.getElementById('out');
+fillSelect(meSel); fillSelect(youSel);
+function renderAdvice(){ const me=byCode(meSel.value||'A1'), you=byCode(youSel.value||'B2');
+  out.innerHTML = '<h2>'+me.name+' × '+you.name+'</h2><p class="small">'+relationKind(idxOf(me.code), idxOf(you.code))+'</p><p>'+advice(me,you)+'</p>'; }
+meSel.onchange=renderAdvice; youSel.onchange=renderAdvice; renderAdvice();
+</script>
+
+<footer class="site-footer" role="contentinfo">
+  <div class="container footer-inner">
+    <div class="brand">Affinia</div>
+    <div class="links">
+      <a href="affinia.html">Affiniaとは</a>
+      <a href="types.html">タイプ一覧</a>
+      <a href="relation.html">タイプ相性</a>
+      <a href="#">利用規約(準備中)</a>
+      <a href="#">プライバシー(準備中)</a>
+    </div>
+    <div class="copy">© <span id="y"></span> Affinia</div>
+  </div>
+</footer>
+<script>document.addEventListener('DOMContentLoaded',()=>{const y=document.getElementById('y'); if(y) y.textContent=new Date().getFullYear();});</script>
+</body></html>
