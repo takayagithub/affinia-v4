@@ -1,5 +1,5 @@
 
-/* v5.5: Single-page quiz, 5-step horizontal only, auto-advance */
+/* v5.6: 7-point Likert, auto-advance, single page */
 (function(){
   'use strict';
   const $ = sel => document.querySelector(sel);
@@ -20,13 +20,13 @@
   });
 
   const Q = [
-    {axis:'X', icon:'🌅', title:'朝のはじまり', left:'ゆっくり整える', right:'すぐ動く'},
-    {axis:'X', icon:'⚡', title:'計画が崩れたら', left:'静かに立て直す', right:'勢いで切替'},
-    {axis:'X', icon:'🎯', title:'チャンスの誘い', left:'様子を見る', right:'まず挑戦'},
-    {axis:'Y', icon:'💬', title:'会話のテンポ', left:'短めが楽', right:'話すと元気'},
-    {axis:'Y', icon:'🧭', title:'決め方', left:'気持ち優先', right:'筋道優先'},
-    {axis:'Y', icon:'🤝', title:'助け方', left:'そっと寄りそう', right:'具体的に動く'},
-    {axis:'Y', icon:'🌙', title:'夜の過ごし方', left:'静かに回復', right:'誰かと発散'}
+    {axis:'X', title:'朝のはじまり', left:'そう思う', right:'そう思わない', bl:'ゆっくり整える', br:'すぐ動く'},
+    {axis:'X', title:'計画が崩れたら勢いで切り替える', left:'そう思う', right:'そう思わない', bl:'静かに立て直す', br:'勢いで切替'},
+    {axis:'X', title:'誘いがあればまず挑戦する', left:'そう思う', right:'そう思わない', bl:'様子を見る', br:'まず挑戦'},
+    {axis:'Y', title:'話すほど元気が出るほうだ', left:'そう思う', right:'そう思わない', bl:'短めが楽', br:'話すと元気'},
+    {axis:'Y', title:'判断は筋道を重視するほうだ', left:'そう思う', right:'そう思わない', bl:'気持ち優先', br:'筋道優先'},
+    {axis:'Y', title:'困っている人には具体的に動いて助ける', left:'そう思う', right:'そう思わない', bl:'そっと寄りそう', br:'具体的に動く'},
+    {axis:'Y', title:'夜は誰かと発散するほうが回復しやすい', left:'そう思う', right:'そう思わない', bl:'静かに回復', br:'誰かと発散'}
   ];
 
   function mountQuiz(){
@@ -34,36 +34,41 @@
     const bar = document.getElementById('bar');
     if(!box || !bar) return;
     box.classList.add('slide');
-    const view = document.createElement('div'); view.className='qview show';
-    const qwrap = document.getElementById('qwrap');
-    if(qwrap) box.replaceChild(view, qwrap); else box.insertBefore(view, box.children[1]);
+    const view = el('div','qview show');
+    const old = document.getElementById('qwrap'); if(old) box.replaceChild(view, old); else box.insertBefore(view, box.children[1]);
 
-    let idx = 0;
-    const ans = Array(Q.length).fill(3);
+    let idx=0;
+    const ans = Array(Q.length).fill(4); // center default (1..7)
 
     function render(){
-      const q = Q[idx];
+      const q=Q[idx];
       bar.style.width = Math.round((idx/Q.length)*100)+'%';
       view.classList.remove('show');
       setTimeout(()=>{
-        view.innerHTML = '';
-        const h2 = document.createElement('h2'); h2.className='q-title';
-        h2.textContent = `Q${idx+1} / ${Q.length}：${q.title}`; view.appendChild(h2);
-        const rail = document.createElement('div'); rail.className='h5';
-        for(let i=1;i<=5;i++){
-          const d = document.createElement('div'); d.className='dot'+(ans[idx]===i?' selected':'');
-          d.setAttribute('role','button'); d.setAttribute('aria-label', `${i} / 5`);
-          d.onclick = ()=>{ ans[idx]=i; if(idx < Q.length-1){ idx++; render(); } else { finish(); } };
-          rail.appendChild(d);
+        view.innerHTML='';
+        const h2 = el('h2','q-title'); h2.textContent=`Q${idx+1} / ${Q.length}：${q.title}`; view.appendChild(h2);
+
+        const likert = el('div','likert');
+        const row = el('div','lk-row');
+        for(let i=1;i<=7;i++){
+          const b = el('button','lk'); b.type='button'; b.dataset.i=String(i);
+          const cls = i<=3 ? 'agree' : (i===4 ? 'neu' : 'dis');
+          b.classList.add(cls);
+          if(ans[idx]===i) b.classList.add('sel');
+          b.onclick=()=>{ ans[idx]=i; if(idx<Q.length-1){ idx++; render(); } else { finish(); } };
+          row.appendChild(b);
         }
-        view.appendChild(rail);
-        const labs = document.createElement('div'); labs.className='labels'; labs.innerHTML = `<span>${q.left}</span><span>${q.right}</span>`; view.appendChild(labs);
+        likert.appendChild(row);
+        const labs = el('div','lk-labels'); labs.innerHTML = `<span>${q.left}</span><span>${q.right}</span>`;
+        likert.appendChild(labs);
+        view.appendChild(likert);
+
         view.classList.add('show');
       }, 10);
     }
 
     function finish(){
-      const norm = ans.map(v=>(v-1)/4);
+      const norm = ans.map(v=>(v-1)/6);
       let x=0,y=0,xc=0,yc=0;
       for(let i=0;i<Q.length;i++){
         if(Q[i].axis==='X'){ x+=norm[i]; xc++; } else { y+=norm[i]; yc++; }
@@ -78,8 +83,8 @@
 
     const prev = document.getElementById('prevBtn');
     const next = document.getElementById('nextBtn');
-    if(prev){ prev.onclick = ()=>{ if(idx>0){ idx--; render(); } }; }
-    if(next){ next.onclick = ()=>{ if(idx<Q.length-1){ idx++; render(); } else { finish(); } }; }
+    if(prev){ prev.onclick=()=>{ if(idx>0){ idx--; render(); } }; }
+    if(next){ next.onclick=()=>{ if(idx<Q.length-1){ idx++; render(); } else { finish(); } }; }
 
     render();
   }
